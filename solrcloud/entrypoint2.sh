@@ -1,3 +1,3 @@
-# needed for 
-chown -R solr /solr*
+set -x
+chown -R solr /solr/example/cloud
 /entrypoint.sh
