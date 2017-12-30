@@ -28,7 +28,6 @@ RUN url="http://www.apache.org/dyn/closer.lua?filename=hbase/$HBASE_VERSION/hbas
 
 COPY entrypoint.sh /
 COPY conf/hbase-site.xml /hbase/conf/
-COPY profile.d/java.sh /etc/profile.d/
 
 # Stargate  8080  / 8085
 # Thrift    9090  / 9095
