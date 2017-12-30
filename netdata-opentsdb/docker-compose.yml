@@ -1,0 +1,15 @@
+version: '2'
+services:
+  netdata:
+    image: grozeille/netdata-opentsdb
+    stdin_open: true
+    tty: true
+    privileged: true
+    environment:
+      OPENTSDB_HOST: "192.168.1.153"
+      OPENTSDB_PORT: "4242"
+    ports:
+      - 19999:19999
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
