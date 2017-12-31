@@ -15,8 +15,17 @@ if [[ $GRAYLOG2_HOST ]]; then
     RANCHER_SERVICE_NAME=$(curl -s http://rancher-metadata/latest/self/service/name)
     RANCHER_STACK_NAME=$(curl -s http://rancher-metadata/latest/self/stack/name)
 
-    sed -i -e "s/log4j.appender.gelf.AdditionalFields=applicationName=solr/log4j.appender.gelf.AdditionalFields=applicationName=solr,rancherContainerName=$RANCHER_CONTAINER_NAME,rancherServiceName=$RANCHER_SERVICE_NAME,rancherStackName=$RANCHER_STACK_NAME/g" $LOG4J_TEMPLATE
-    sed -i -e "s/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String,rancherContainerName=String,rancherServiceName=String,rancherStackName=String/g" $LOG4J_TEMPLATE
+    CONTAINER_ID=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1)
+    CONTAINER_ID_SHORT=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1 | head -c 12)
+
+    sed -i -e "s/log4j.appender.gelf.AdditionalFields=applicationName=(.*)/log4j.appender.gelf.AdditionalFields=applicationName=\1,containerId=$CONTAINER_ID,containerIdShort=$CONTAINER_ID_SHORT,rancherContainerName=$RANCHER_CONTAINER_NAME,rancherServiceName=$RANCHER_SERVICE_NAME,rancherStackName=$RANCHER_STACK_NAME/g" $LOG4J_TEMPLATE
+    sed -i -e "s/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String,containerId=String,containerIdShort=String,rancherContainerName=String,rancherServiceName=String,rancherStackName=String/g" $LOG4J_TEMPLATE
+  else
+    CONTAINER_ID=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1)
+    CONTAINER_ID_SHORT=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1 | head -c 12)
+
+    sed -i -e "s/log4j.appender.gelf.AdditionalFields=applicationName=(.*)/log4j.appender.gelf.AdditionalFields=applicationName=\1,containerId=$CONTAINER_ID,containerIdShort=$CONTAINER_ID_SHORT/g" $LOG4J_TEMPLATE
+    sed -i -e "s/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String,containerId=String,containerIdShort=String/g" $LOG4J_TEMPLATE
   fi
 
   cat $LOG4J_TEMPLATE >> $LOG4J_DESTINATION
