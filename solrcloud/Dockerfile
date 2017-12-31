@@ -36,10 +36,11 @@ RUN url="http://www.apache.org/dyn/closer.lua?filename=lucene/solr/$SOLRCLOUD_VE
 
 COPY entrypoint.sh /
 COPY solr-start.sh /
+COPY update-gelf-log4j.sh /
 
 RUN adduser --system --shell /bin/bash solr && \
     chown -R solr /solr* && \
-    chmod 0555 /entrypoint.sh /solr-start.sh
+    chmod 0555 /entrypoint.sh /solr-start.sh /update-gelf-log4j.sh
 
 COPY log4j.properties /tmp
 COPY logstash-gelf-1.11.1.jar /solr/server/lib/ext/
