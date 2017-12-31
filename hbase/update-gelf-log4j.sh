@@ -8,6 +8,16 @@ if [[ $GRAYLOG2_HOST ]]; then
   sed -i -e "s/log4j.appender.gelf.Host=udp:localhost/log4j.appender.gelf.Host=udp:$GRAYLOG2_HOST/g" $LOG4J_TEMPLATE
   sed -i -e "s/log4j.appender.gelf.Port=12201/log4j.appender.gelf.Port=$CURRENT_GRAYLOG2_PORT/g" $LOG4J_TEMPLATE
 
+  CONTAINER_ID=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1)
+  CONTAINER_ID_SHORT=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1 | head -c 12)
+
+
+  ADDITIONAL_FIELDS="containerId=$CONTAINER_ID"
+  ADDITIONAL_FIELDS+=",containerIdShort=$CONTAINER_ID_SHORT"
+
+  ADDITIONAL_FIELD_TYPES="containerId=String"
+  ADDITIONAL_FIELD_TYPES+=",containerIdShort=String"
+
   # if in rancher, retrieve container data
   if curl --output /dev/null --silent --head --fail "http://rancher-metadata/latest/version"; then
     echo "Container launched in Rancher, fetching additional data"
@@ -15,18 +25,17 @@ if [[ $GRAYLOG2_HOST ]]; then
     RANCHER_SERVICE_NAME=$(curl -s http://rancher-metadata/latest/self/service/name)
     RANCHER_STACK_NAME=$(curl -s http://rancher-metadata/latest/self/stack/name)
 
-    CONTAINER_ID=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1)
-    CONTAINER_ID_SHORT=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1 | head -c 12)
+    ADDITIONAL_FIELDS+=",rancherContainerName=$RANCHER_CONTAINER_NAME"
+    ADDITIONAL_FIELDS+=",rancherServiceName=$RANCHER_SERVICE_NAME"
+    ADDITIONAL_FIELDS+=",rancherStackName=$RANCHER_STACK_NAME"
 
-    sed -i -e "s/log4j.appender.gelf.AdditionalFields=applicationName=\(.*\)/log4j.appender.gelf.AdditionalFields=applicationName=\1,containerId=$CONTAINER_ID,containerIdShort=$CONTAINER_ID_SHORT,rancherContainerName=$RANCHER_CONTAINER_NAME,rancherServiceName=$RANCHER_SERVICE_NAME,rancherStackName=$RANCHER_STACK_NAME/g" $LOG4J_TEMPLATE
-    sed -i -e "s/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String,containerId=String,containerIdShort=String,rancherContainerName=String,rancherServiceName=String,rancherStackName=String/g" $LOG4J_TEMPLATE
-  else
-    CONTAINER_ID=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1)
-    CONTAINER_ID_SHORT=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1 | head -c 12)
-
-    sed -i -e "s/log4j.appender.gelf.AdditionalFields=applicationName=(.*)/log4j.appender.gelf.AdditionalFields=applicationName=\1,containerId=$CONTAINER_ID,containerIdShort=$CONTAINER_ID_SHORT/g" $LOG4J_TEMPLATE
-    sed -i -e "s/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String,containerId=String,containerIdShort=String/g" $LOG4J_TEMPLATE
+    ADDITIONAL_FIELD_TYPES+=",rancherContainerName=String"
+    ADDITIONAL_FIELD_TYPES+=",rancherServiceName=String"
+    ADDITIONAL_FIELD_TYPES+=",rancherStackName=String"
   fi
+
+  sed -i -e "s/log4j.appender.gelf.AdditionalFields=applicationName=\(.*\)/log4j.appender.gelf.AdditionalFields=applicationName=\1,$ADDITIONAL_FIELDS/g" $LOG4J_TEMPLATE
+  sed -i -e "s/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String,$ADDITIONAL_FIELD_TYPES/g" $LOG4J_TEMPLATE
 
   cat $LOG4J_TEMPLATE >> $LOG4J_DESTINATION
   echo "log4j configuration:"
