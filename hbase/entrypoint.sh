@@ -24,6 +24,10 @@ echo "==========================================================================
 echo "                              HBase Docker Container"
 echo "================================================================================"
 echo
+
+# update log4j to use GELF if provided
+/update-gelf-log4j.sh /tmp/log4j.properties /hbase/conf/log4j.properties
+
 # shell breaks and doesn't run zookeeper without this
 mkdir -pv /hbase/logs
 

@@ -28,6 +28,12 @@ RUN url="http://www.apache.org/dyn/closer.lua?filename=hbase/$HBASE_VERSION/hbas
 
 COPY entrypoint.sh /
 COPY conf/hbase-site.xml /hbase/conf/
+COPY update-gelf-log4j.sh /
+
+COPY log4j.properties /tmp
+COPY logstash-gelf-1.11.1.jar /hbase/lib/
+
+RUN chmod 0555 /entrypoint.sh /update-gelf-log4j.sh
 
 # Stargate  8080  / 8085
 # Thrift    9090  / 9095
