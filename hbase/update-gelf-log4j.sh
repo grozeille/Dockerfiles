@@ -11,7 +11,6 @@ if [[ $GRAYLOG2_HOST ]]; then
   CONTAINER_ID=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1)
   CONTAINER_ID_SHORT=$(cat /proc/self/cgroup | grep "docker" | sed s/\\//\\n/g | tail -1 | head -c 12)
 
-
   ADDITIONAL_FIELDS="containerId=$CONTAINER_ID"
   ADDITIONAL_FIELDS+=",containerIdShort=$CONTAINER_ID_SHORT"
 

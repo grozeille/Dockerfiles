@@ -28,6 +28,7 @@ RUN url="http://www.apache.org/dyn/closer.lua?filename=hbase/$HBASE_VERSION/hbas
 
 COPY entrypoint.sh /
 COPY conf/hbase-site.xml /hbase/conf/
+COPY conf/hbase-env.sh /hbase/conf/
 COPY update-gelf-log4j.sh /
 
 COPY log4j.properties /tmp

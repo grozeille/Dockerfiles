@@ -27,6 +27,11 @@ echo
 
 # update log4j to use GELF if provided
 /update-gelf-log4j.sh /tmp/log4j.properties /hbase/conf/log4j.properties
+# enable the log4j conf for GELF
+if [[ $GRAYLOG2_HOST ]]; then
+  echo "export HBASE_ROOT_LOGGER=INFO,gelf" >> /hbase/conf/hbase-env.sh
+  echo "export HBASE_SECURITY_LOGGER=INFO,gelf" >> /hbase/conf/hbase-env.sh
+fi
 
 # shell breaks and doesn't run zookeeper without this
 mkdir -pv /hbase/logs
