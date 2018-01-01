@@ -13,7 +13,7 @@ ENV PATH $PATH:/hbase/bin
 
 WORKDIR /
 
-RUN apt-get update -qq && apt-get install -qqy wget tar
+RUN apt-get update -qq && apt-get install -qqy wget curl tar
 
 RUN url="http://www.apache.org/dyn/closer.lua?filename=hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz&action=download"; \
     url_archive="http://archive.apache.org/dist/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz"; \
