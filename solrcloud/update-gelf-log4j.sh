@@ -37,7 +37,7 @@ if [[ $GRAYLOG2_HOST ]]; then
   sed -i -e "s/log4j.appender.gelf.AdditionalFields=applicationName=\(.*\)/log4j.appender.gelf.AdditionalFields=applicationName=\1,$ADDITIONAL_FIELDS/g" $LOG4J_TEMPLATE
   sed -i -e "s/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String/log4j.appender.gelf.AdditionalFieldTypes=applicationName=String,$ADDITIONAL_FIELD_TYPES/g" $LOG4J_TEMPLATE
 
-  cat $LOG4J_TEMPLATE >> $LOG4J_DESTINATION
+  cat $LOG4J_TEMPLATE > $LOG4J_DESTINATION
   echo "log4j configuration:"
   cat $LOG4J_DESTINATION
 fi
